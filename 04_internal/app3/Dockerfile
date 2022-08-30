@@ -16,17 +16,16 @@ COPY ../../.. ./
 
 RUN go build apps/http/server.go
 
-EXPOSE ${PORT}
-
-CMD [ "./server" ]
+#CMD [ "./server" ]
 
 # Deploy
-#FROM scratch AS final
-#
-#WORKDIR /
-#
-#COPY --from=build /server /server
-#
-#EXPOSE ${PORT}
-#
-#CMD ["/server"]
+FROM alpine:3.15 AS final
+
+WORKDIR /
+
+COPY --from=build app/server /server
+COPY --from=build app/configs /configs
+
+EXPOSE ${PORT}
+
+CMD ["./server"]
