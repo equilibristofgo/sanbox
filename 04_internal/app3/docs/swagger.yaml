@@ -1,0 +1,114 @@
+definitions:
+  dto.Task:
+    properties:
+      description:
+        type: string
+      isDone:
+        type: boolean
+      owner:
+        type: string
+      priority:
+        type: integer
+    type: object
+info:
+  contact:
+    name: API Support
+    url: http://www.swagger.io/support
+  description: Micro-template is a microservice that has examples of database connection.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Swagger API micro-template
+  version: "1.0"
+paths:
+  /v1/template/tasks:
+    post:
+      consumes:
+      - application/json
+      description: Create new task
+      parameters:
+      - description: task body
+        in: body
+        name: task
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Task'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Task'
+      summary: New task
+      tags:
+      - Tasks
+  /v1/template/tasks/{taskId}:
+    delete:
+      consumes:
+      - application/json
+      description: Delete task with specified id
+      parameters:
+      - description: taskId
+        in: path
+        name: taskId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Delete task
+      tags:
+      - Tasks
+    get:
+      consumes:
+      - application/json
+      description: Get task with specified id
+      parameters:
+      - description: taskId
+        in: path
+        name: taskId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/dto.Task'
+      summary: Get task
+      tags:
+      - Tasks
+    put:
+      consumes:
+      - application/json
+      description: Update task with specified id
+      parameters:
+      - description: taskId
+        in: path
+        name: taskId
+        required: true
+        type: string
+      - description: task body
+        in: body
+        name: task
+        required: true
+        schema:
+          $ref: '#/definitions/dto.Task'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: Update task
+      tags:
+      - Tasks
+swagger: "2.0"
