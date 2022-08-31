@@ -1,0 +1,11 @@
+development:
+  database:
+    type: postgres
+    host: postgres
+    port: 5432
+    user: postgres
+    password: 12345678
+    database: postgres
+    schema: schema
+    maxidleconns: 4 #0 if not applicable
+    maxopenconns: 8 #0 if not applicable

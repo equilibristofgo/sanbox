@@ -1,0 +1,11 @@
+development:
+  database:
+    type: mongoDB
+    host: localhost
+    port: 27017
+    user:
+    password:
+    database:
+    schema:
+    maxidleconns:
+    maxopenconns:
