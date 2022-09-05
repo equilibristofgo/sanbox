@@ -1,10 +1,18 @@
 package main
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	"net/http"
+	"os"
+	"os/signal"
 	"sync"
+	"syscall"
+	"testing"
 	"time"
+
+	"github.com/cornelk/hashmap"
 )
 
 type Metadata struct {
@@ -17,27 +25,79 @@ type RemoteProperties struct {
 	ExpectedResponseCodes []int       `json:"expected_response_codes"`
 }
 
-type Cache struct {
+type LockFreeJobCache struct {
+	jobs  *hashmap.HashMap
+	jobDB JobDB
 }
 
-func (c *Cache) Set(j *Job) {
+type JobCache interface {
+	GetAll() *JobsMap
+	Set(j *Job) error
+}
+
+type JobDB interface {
+	GetAll() ([]*Job, error)
+}
+
+type JobsMap struct {
+	Jobs map[string]*Job
+	Lock sync.RWMutex
+}
+
+func NewJobsMap() *JobsMap {
+	return &JobsMap{
+		Jobs: map[string]*Job{},
+		Lock: sync.RWMutex{},
+	}
+}
+
+func NewLockFreeJobCache(jobDB JobDB) *LockFreeJobCache {
+	return &LockFreeJobCache{
+		jobs:  hashmap.New(8), //nolint:gomnd
+		jobDB: jobDB,
+	}
+}
+
+func (c *LockFreeJobCache) Set(j *Job) error {
+	if j == nil {
+		return nil
+	}
+
+	c.jobs.Set(j.Id, j)
+	return nil
+}
+
+func (c *LockFreeJobCache) GetAll() *JobsMap {
+	jm := NewJobsMap()
+	for el := range c.jobs.Iter() {
+		jm.Jobs[el.Key.(string)] = el.Value.(*Job)
+	}
+	return jm
+}
+
+func (c *LockFreeJobCache) Start() {
+	allJobs, _ := c.jobDB.GetAll()
+	for _, j := range allJobs {
+		j.StartWaiting(c)
+	}
 }
 
 type Job struct {
+	Id       string
 	Metadata Metadata
 	RemoteProperties
 	lock sync.RWMutex
 }
 
 // Other type...
-func (j *Job) StartWaiting(cache Cache, wg sync.WaitGroup) {
+func (j *Job) StartWaiting(cache JobCache) {
 
 	j.lock.Lock()
 	defer j.lock.Unlock()
 
-	jobRun := func() { j.Run(cache, wg) }
+	jobRun := func() { j.Run(cache) }
 
-	d := time.Duration(3) * time.Second
+	d := time.Duration(1) * time.Second
 	t := time.AfterFunc(d, jobRun)
 
 	// Calling stop method
@@ -45,12 +105,12 @@ func (j *Job) StartWaiting(cache Cache, wg sync.WaitGroup) {
 	defer t.Stop()
 
 	// Calling sleep method
-	time.Sleep(10 * time.Second)
+	time.Sleep(2 * time.Second)
 
 	t.Reset(d)
 }
 
-func (j *Job) Run(c Cache, wg sync.WaitGroup) {
+func (j *Job) Run(c JobCache) {
 	j.lock.RLock()
 	jobRunner := &JobRunner{job: j, meta: j.Metadata}
 	j.lock.RUnlock()
@@ -66,16 +126,17 @@ func (j *Job) Run(c Cache, wg sync.WaitGroup) {
 	j.lock.RUnlock()
 
 	j.lock.Lock()
-	go j.StartWaiting(c, wg)
+	go j.StartWaiting(c)
 	j.lock.Unlock()
 
 	fmt.Println("Run")
-	wg.Done()
 }
 
 func (j *JobRunner) RemoteRun() {
 	req, _ := http.NewRequest(http.MethodGet, "url", nil)
 	j.setHeaders(req)
+	// Do the request
+	http.DefaultClient.Do(req.WithContext(context.Background()))
 }
 
 type JobRunner struct {
@@ -83,7 +144,7 @@ type JobRunner struct {
 	meta Metadata
 }
 
-func (j *JobRunner) Run(c Cache) Metadata {
+func (j *JobRunner) Run(c JobCache) Metadata {
 	j.job.lock.RLock()
 	defer j.job.lock.RUnlock()
 
@@ -120,19 +181,132 @@ func (j *JobRunner) setHeaders(req *http.Request) {
 	req.Header = j.job.RemoteProperties.Headers
 }
 
+func (j *Job) Init(c JobCache) error {
+	j.lock.Lock()
+	defer j.lock.Unlock()
+
+	c.Set(j)
+	go j.Run(c)
+
+	j.lock.Unlock()
+	j.StartWaiting(c)
+	j.lock.Lock()
+
+	return nil
+}
+
+type MockDBGetAll struct {
+	MockDB
+	response []*Job
+}
+
+func (d *MockDBGetAll) GetAll() ([]*Job, error) {
+	return d.response, nil
+}
+
+type MockDB struct{}
+
+func (m *MockDB) GetAll() ([]*Job, error) {
+	return nil, nil
+}
+func (m *MockDB) Get(id string) (*Job, error) {
+	return nil, nil
+}
+func (m *MockDB) Delete(id string) error {
+	return nil
+}
+func (m *MockDB) Save(job *Job) error {
+	return nil
+}
+func (m *MockDB) Close() error {
+	return nil
+}
+
+func NewMockCache() *LockFreeJobCache {
+	return NewLockFreeJobCache(&MockDB{})
+}
+
+func parseTime(t *testing.T, value string) time.Time {
+	now, err := time.Parse("2006-Jan-02 15:04", value)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return now
+}
+
+var _ JobDB = (*MemoryDB)(nil)
+
+type MemoryDB struct {
+	m    map[string]*Job
+	lock sync.RWMutex
+}
+
+func NewMemoryDB() *MemoryDB {
+	return &MemoryDB{
+		m: map[string]*Job{},
+	}
+}
+
+func (m *MemoryDB) GetAll() (ret []*Job, _ error) {
+	m.lock.RLock()
+	defer m.lock.RUnlock()
+	for _, v := range m.m {
+		ret = append(ret, v)
+	}
+	return
+}
+
+func (m *MemoryDB) Get(id string) (*Job, error) {
+	m.lock.RLock()
+	defer m.lock.RUnlock()
+	j, exist := m.m[id]
+	if !exist {
+		return nil, errors.New("NotFound")
+	}
+	return j, nil
+}
+
+func (m *MemoryDB) Delete(id string) error {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	if _, exists := m.m[id]; !exists {
+		return errors.New("Doesn't exist") // Used for testing
+	}
+	delete(m.m, id)
+	// log.Printf("After delete: %+v", m)
+	return nil
+}
+
+func (m *MemoryDB) Save(j *Job) error {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	m.m[j.Id] = j
+	return nil
+}
+
+func (m *MemoryDB) Close() error {
+	return nil
+}
+
 func main() {
 
-	var wg sync.WaitGroup
+	mdb2b := NewMemoryDB()
+	c := NewLockFreeJobCache(mdb2b)
 
-	c := Cache{}
 	j := &Job{Metadata: Metadata{
 		SuccessCount: 0,
 	}}
 
-	wg.Add(1)
+	j.Init(c)
+	c.Start()
 
-	go j.Run(c, wg)
+	j.Run(c)
 
-	wg.Wait()
+	sigs := make(chan os.Signal, 1)
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+	done := make(chan bool, 1)
+	fmt.Println("awaiting signal")
+	<-done
+	fmt.Println("exiting")
 
 }

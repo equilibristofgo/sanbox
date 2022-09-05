@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"sync"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -26,13 +25,12 @@ func TestRemoteJobRunner(t *testing.T) {
 		},
 	}
 
-	cache := Cache{}
-	// mockRemoteJob.Init(cache)
-	// cache.Start(0, 2*time.Second) // Retain 1 minute
+	mdb2b := NewMemoryDB()
+	cache := NewLockFreeJobCache(mdb2b)
 
-	var wg sync.WaitGroup
-	wg.Add(1)
-	mockRemoteJob.Run(cache, wg)
+	mockRemoteJob.Init(cache)
+	cache.Start()
+	mockRemoteJob.Run(cache)
 
 	mockRemoteJob.lock.RLock()
 	assert.True(t, mockRemoteJob.Metadata.SuccessCount == 1)
