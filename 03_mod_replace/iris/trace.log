@@ -1,0 +1,38 @@
+$ make docker
+go get -u
+go mod tidy
+go mod vendor
+docker build -t iris-demoapp .
+Sending build context to Docker daemon  46.54MB
+Step 1/9 : FROM golang:1.17 AS builder
+ ---> 742df529b073
+Step 2/9 : RUN apt-get update
+ ---> Using cache
+ ---> 5448fe75177a
+Step 3/9 : ENV GO111MODULE=on     CGO_ENABLED=0     GOOS=linux     GOARCH=amd64
+ ---> Using cache
+ ---> fe348f2ee358
+Step 4/9 : WORKDIR /go/src/demoapp
+ ---> Using cache
+ ---> 379403e3d431
+Step 5/9 : COPY . .
+ ---> 01f006a17d35
+Step 6/9 : RUN go build -mod vendor -o /go/bin/demoapp
+ ---> Running in 51142411b8c3
+Removing intermediate container 51142411b8c3
+ ---> 369e31039785
+Step 7/9 : FROM scratch
+ ---> 
+Step 8/9 : COPY --from=builder /go/bin/demoapp .
+ ---> Using cache
+ ---> 800890b0ff56
+Step 9/9 : ENTRYPOINT ["./demoapp"]
+ ---> Using cache
+ ---> 0dcec951c362
+Successfully built 0dcec951c362
+Successfully tagged iris-demoapp:latest
+docker run --rm -it -p 8080:8080 iris-demoapp:latest
+Iris Version: 12.2.0-beta4
+
+Now listening on: http://localhost:8080
+Application started. Press CTRL+C to shut down.
