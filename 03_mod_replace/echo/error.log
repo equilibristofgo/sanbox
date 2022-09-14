@@ -1,0 +1,31 @@
+$ make docker 
+docker build -t echo-demoapp .
+Sending build context to Docker daemon  15.36kB
+Step 1/9 : FROM golang:latest AS builder
+ ---> 4f7c78c9b46f
+Step 2/9 : RUN apt-get update
+ ---> Using cache
+ ---> d5fd3d934566
+Step 3/9 : ENV GO111MODULE=on     CGO_ENABLED=0     GOOS=linux     GOARCH=amd64
+ ---> Using cache
+ ---> 7424ae5be59d
+Step 4/9 : WORKDIR /go/src/demoapp
+ ---> Using cache
+ ---> 8f7573975172
+Step 5/9 : COPY . .
+ ---> cd307886b4f1
+Step 6/9 : RUN go install
+ ---> Running in 0169bce4c3b5
+go: downloading github.com/labstack/echo/v4 v4.9.0
+go: downloading github.com/labstack/gommon v0.3.1
+go: downloading golang.org/x/crypto v0.0.0-20210817164053-32db794688a5
+go: downloading golang.org/x/net v0.0.0-20211015210444-4f30a5c0130f
+go: downloading github.com/mattn/go-colorable v0.1.11
+go: downloading github.com/mattn/go-isatty v0.0.14
+go: downloading github.com/valyala/fasttemplate v1.2.1
+go: downloading golang.org/x/sys v0.0.0-20211103235746-7861aae1554b
+go: downloading github.com/valyala/bytebufferpool v1.0.0
+go: downloading golang.org/x/text v0.3.7
+server.go:4:2: github.com/equilibristofgo/sandbox/03_mod_replace/pkg@v0.0.0-00010101000000-000000000000: replacement directory ../pkg does not exist
+The command '/bin/sh -c go install' returned a non-zero code: 1
+make: *** [Makefile:7: docker] Error 1
