@@ -1,4 +1,4 @@
-module github.com/equilibristofgo/sandbox/05_race_condition
+module github.com/equilibristofgo/sandbox/05_race_condition/v2
 
 go 1.18
 

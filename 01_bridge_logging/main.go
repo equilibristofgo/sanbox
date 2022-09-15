@@ -4,78 +4,17 @@ package main
 import (
 	"context"
 	"os"
-	"sync"
 	"time"
 
 	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 	"go.uber.org/zap"
-	"go.uber.org/zap/buffer"
 	"go.uber.org/zap/zapcore"
 )
 
 const (
 	REQUEST_ID = "request_id"
 )
-
-// With this, try to hook every print with zerolog
-type SeverityHook struct{}
-
-// Need to implement this
-func (h SeverityHook) Run(e *zerolog.Event, level zerolog.Level, msg string) {
-	if level != zerolog.NoLevel {
-		e.Str("severity", level.String())
-	}
-}
-
-// With this, try to create a encoder for zap logger that access to the fields that are injected
-type zeroLogEncoder struct {
-	zapcore.Encoder
-
-	ctx           context.Context `json:"ctx,omitempty"`
-	zeroLogLogger *zerolog.Logger `json:"zero_log_logger,omitempty"`
-
-	event *zerolog.Event `json:"event,omitempty"`
-}
-
-// A simple implementation
-func (e *zeroLogEncoder) Clone() zapcore.Encoder {
-	clone := sync.Pool{New: func() interface{} {
-		return &zeroLogEncoder{e.Encoder, e.ctx, e.zeroLogLogger, e.event}
-	}}
-
-	return clone.Get().(*zeroLogEncoder)
-}
-
-// Needed for the fields added in initialization
-func (e *zeroLogEncoder) AddString(key, value string) {
-	e.event = e.event.Str(key, value)
-}
-
-func (e *zeroLogEncoder) EncodeEntry(entry zapcore.Entry, fields []zapcore.Field) (*buffer.Buffer, error) {
-	for _, f := range fields {
-		// TODO Check types
-		switch f.Type {
-		case zapcore.StringType:
-			// intCtx := context.WithValue(*e.ctx, propagateKey, &Values{Key: f.Key, Value: f.String}))
-			// e.ctx = &intCtx
-
-			e.event = e.event.Str(f.Key, f.String)
-		case zapcore.Int16Type:
-		case zapcore.Int32Type:
-		case zapcore.Int64Type:
-			e.event = e.event.Int64(f.Key, f.Integer)
-
-		case zapcore.DurationType:
-			e.event = e.event.Dur(f.Key, time.Duration(f.Integer))
-		default:
-		}
-	}
-
-	e.event.Msg("ZEROLOG LOGGER - Generic message")
-
-	return e.Encoder.EncodeEntry(entry, fields)
-}
 
 type (
 	// contextKey is an unexported type used as key for items stored in the
@@ -93,66 +32,6 @@ type (
 )
 
 var propagateKey = contextKey{}
-
-type ContextualLoggerBridge struct {
-	zerolog.Logger
-	zapLogger      zap.Logger
-	sampled        zerolog.Logger
-	logContextFunc func(context.Context, *zerolog.Event) *zerolog.Event
-}
-
-func (l ContextualLoggerBridge) genericLogWithContext(ctx context.Context, logFunc func() *zerolog.Event) *zerolog.Event {
-	l.zapLogger.Info("")
-
-	if l.logContextFunc != nil {
-		return l.logContextFunc(ctx, logFunc())
-	}
-	return logFunc()
-}
-
-func (l ContextualLoggerBridge) TraceWithContext(ctx context.Context) *zerolog.Event {
-	return l.genericLogWithContext(ctx, l.Trace)
-}
-
-func (l ContextualLoggerBridge) DebugWithContext(ctx context.Context) *zerolog.Event {
-	return l.genericLogWithContext(ctx, l.Debug)
-}
-
-func (l ContextualLoggerBridge) InfoWithContext(ctx context.Context) *zerolog.Event {
-	return l.genericLogWithContext(ctx, l.Info)
-}
-
-func (l ContextualLoggerBridge) WarnWithContext(ctx context.Context) *zerolog.Event {
-	return l.genericLogWithContext(ctx, l.Warn)
-}
-
-func (l ContextualLoggerBridge) ErrorWithContext(ctx context.Context) *zerolog.Event {
-	return l.genericLogWithContext(ctx, l.Error)
-}
-
-func (l ContextualLoggerBridge) FatalWithContext(ctx context.Context) *zerolog.Event {
-	return l.genericLogWithContext(ctx, l.Fatal)
-}
-
-func (l ContextualLoggerBridge) SampledTrace(ctx context.Context) *zerolog.Event {
-	return l.genericLogWithContext(ctx, l.sampled.Trace)
-}
-
-func (l ContextualLoggerBridge) SampledDebug(ctx context.Context) *zerolog.Event {
-	return l.genericLogWithContext(ctx, l.sampled.Debug)
-}
-
-func (l ContextualLoggerBridge) SampledInfo(ctx context.Context) *zerolog.Event {
-	return l.genericLogWithContext(ctx, l.sampled.Info)
-}
-
-func (l ContextualLoggerBridge) SampledWarn(ctx context.Context) *zerolog.Event {
-	return l.genericLogWithContext(ctx, l.sampled.Warn)
-}
-
-func (l ContextualLoggerBridge) SampledError(ctx context.Context) *zerolog.Event {
-	return l.genericLogWithContext(ctx, l.sampled.Error)
-}
 
 func GetKeyFromCtx(ctx context.Context, key string) string {
 	if val := ctx.Value(propagateKey); val != nil {
