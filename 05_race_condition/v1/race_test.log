@@ -1,0 +1,226 @@
+jose@x230n:~/git/equilibristofgo/sandbox/05_race_condition$ ./race_test.sh 
+==================
+WARNING: DATA RACE
+Read at 0x00c0001223d8 by goroutine 9:
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*JobRunner).setHeaders()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:174 +0xaf
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*JobRunner).RemoteRun()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:137 +0x89
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*JobRunner).Run()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:151 +0xb9
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*Job).Run()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:118 +0xa7
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*Job).Init.func2()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:189 +0x58
+
+Previous write at 0x00c0001223d8 by goroutine 7:
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*JobRunner).setHeaders()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:175 +0x104
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*JobRunner).RemoteRun()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:137 +0x89
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*JobRunner).Run()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:151 +0xb9
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*Job).Run()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:118 +0xa7
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.TestRemoteJobRunner()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main_test.go:33 +0x3cd
+  testing.tRunner()
+      /usr/lib/go-1.18/src/testing/testing.go:1439 +0x213
+  testing.(*T).Run.func1()
+      /usr/lib/go-1.18/src/testing/testing.go:1486 +0x47
+
+Goroutine 9 (running) created at:
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*Job).Init()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:189 +0x184
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.TestRemoteJobRunner()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main_test.go:31 +0x3a4
+  testing.tRunner()
+      /usr/lib/go-1.18/src/testing/testing.go:1439 +0x213
+  testing.(*T).Run.func1()
+      /usr/lib/go-1.18/src/testing/testing.go:1486 +0x47
+
+Goroutine 7 (running) created at:
+  testing.(*T).Run()
+      /usr/lib/go-1.18/src/testing/testing.go:1486 +0x724
+  testing.runTests.func1()
+      /usr/lib/go-1.18/src/testing/testing.go:1839 +0x99
+  testing.tRunner()
+      /usr/lib/go-1.18/src/testing/testing.go:1439 +0x213
+  testing.runTests()
+      /usr/lib/go-1.18/src/testing/testing.go:1837 +0x7e4
+  testing.(*M).Run()
+      /usr/lib/go-1.18/src/testing/testing.go:1719 +0xa71
+  main.main()
+      _testmain.go:47 +0x2e4
+==================
+==================
+WARNING: DATA RACE
+Read at 0x00c00009a120 by goroutine 11:
+  runtime.mapaccess1_faststr()
+      /usr/lib/go-1.18/src/runtime/map_faststr.go:13 +0x0
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*JobRunner).setHeaders()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:178 +0x188
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*JobRunner).RemoteRun()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:137 +0x89
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*JobRunner).Run()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:151 +0xb9
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*Job).Run()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:118 +0xa7
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*Job).StartWaiting.func1()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:98 +0x4c
+
+Previous write at 0x00c00009a120 by goroutine 7:
+  runtime.mapassign_faststr()
+      /usr/lib/go-1.18/src/runtime/map_faststr.go:203 +0x0
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*JobRunner).setHeaders()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:179 +0x248
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*JobRunner).RemoteRun()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:137 +0x89
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*JobRunner).Run()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:151 +0xb9
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*Job).Run()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:118 +0xa7
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.TestRemoteJobRunner()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main_test.go:33 +0x3cd
+  testing.tRunner()
+      /usr/lib/go-1.18/src/testing/testing.go:1439 +0x213
+  testing.(*T).Run.func1()
+      /usr/lib/go-1.18/src/testing/testing.go:1486 +0x47
+
+Goroutine 11 (running) created at:
+  time.goFunc()
+      /usr/lib/go-1.18/src/time/sleep.go:176 +0x47
+
+Goroutine 7 (running) created at:
+  testing.(*T).Run()
+      /usr/lib/go-1.18/src/testing/testing.go:1486 +0x724
+  testing.runTests.func1()
+      /usr/lib/go-1.18/src/testing/testing.go:1839 +0x99
+  testing.tRunner()
+      /usr/lib/go-1.18/src/testing/testing.go:1439 +0x213
+  testing.runTests()
+      /usr/lib/go-1.18/src/testing/testing.go:1837 +0x7e4
+  testing.(*M).Run()
+      /usr/lib/go-1.18/src/testing/testing.go:1719 +0xa71
+  main.main()
+      _testmain.go:47 +0x2e4
+==================
+==================
+WARNING: DATA RACE
+Read at 0x00c0000ac088 by goroutine 9:
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*JobRunner).setHeaders()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:178 +0x195
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*JobRunner).RemoteRun()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:137 +0x89
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*JobRunner).Run()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:151 +0xb9
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*Job).Run()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:118 +0xa7
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*Job).Init.func2()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:189 +0x58
+
+Previous write at 0x00c0000ac088 by goroutine 7:
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*JobRunner).setHeaders()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:179 +0x257
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*JobRunner).RemoteRun()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:137 +0x89
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*JobRunner).Run()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:151 +0xb9
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*Job).Run()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:118 +0xa7
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.TestRemoteJobRunner()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main_test.go:33 +0x3cd
+  testing.tRunner()
+      /usr/lib/go-1.18/src/testing/testing.go:1439 +0x213
+  testing.(*T).Run.func1()
+      /usr/lib/go-1.18/src/testing/testing.go:1486 +0x47
+
+Goroutine 9 (running) created at:
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*Job).Init()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:189 +0x184
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.TestRemoteJobRunner()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main_test.go:31 +0x3a4
+  testing.tRunner()
+      /usr/lib/go-1.18/src/testing/testing.go:1439 +0x213
+  testing.(*T).Run.func1()
+      /usr/lib/go-1.18/src/testing/testing.go:1486 +0x47
+
+Goroutine 7 (running) created at:
+  testing.(*T).Run()
+      /usr/lib/go-1.18/src/testing/testing.go:1486 +0x724
+  testing.runTests.func1()
+      /usr/lib/go-1.18/src/testing/testing.go:1839 +0x99
+  testing.tRunner()
+      /usr/lib/go-1.18/src/testing/testing.go:1439 +0x213
+  testing.runTests()
+      /usr/lib/go-1.18/src/testing/testing.go:1837 +0x7e4
+  testing.(*M).Run()
+      /usr/lib/go-1.18/src/testing/testing.go:1719 +0xa71
+  main.main()
+      _testmain.go:47 +0x2e4
+==================
+==================
+WARNING: DATA RACE
+Read at 0x00c000098050 by goroutine 11:
+  runtime.slicecopy()
+      /usr/lib/go-1.18/src/runtime/slice.go:295 +0x0
+  net/http.Header.Clone()
+      /usr/lib/go-1.18/src/net/http/header.go:112 +0x264
+  net/http.cloneOrMakeHeader()
+      /usr/lib/go-1.18/src/net/http/clone.go:69 +0x365
+  net/http.(*Client).makeHeadersCopier()
+      /usr/lib/go-1.18/src/net/http/client.go:754 +0x75
+  net/http.(*Client).do()
+      /usr/lib/go-1.18/src/net/http/client.go:614 +0x165
+  net/http.(*Client).Do()
+      /usr/lib/go-1.18/src/net/http/client.go:593 +0x639
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*JobRunner).RemoteRun()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:139 +0x61d
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*JobRunner).Run()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:151 +0xb9
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*Job).Run()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:118 +0xa7
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*Job).StartWaiting.func1()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:98 +0x4c
+
+Previous write at 0x00c000098050 by goroutine 7:
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*JobRunner).setHeaders()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:179 +0x1c4
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*JobRunner).RemoteRun()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:137 +0x89
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*JobRunner).Run()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:151 +0xb9
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.(*Job).Run()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main.go:118 +0xa7
+  github.com/equilibristofgo/sandbox/05_race_condition/v1.TestRemoteJobRunner()
+      /home/jose/git/equilibristofgo/sandbox/05_race_condition/main_test.go:33 +0x3cd
+  testing.tRunner()
+      /usr/lib/go-1.18/src/testing/testing.go:1439 +0x213
+  testing.(*T).Run.func1()
+      /usr/lib/go-1.18/src/testing/testing.go:1486 +0x47
+
+Goroutine 11 (running) created at:
+  time.goFunc()
+      /usr/lib/go-1.18/src/time/sleep.go:176 +0x47
+
+Goroutine 7 (running) created at:
+  testing.(*T).Run()
+      /usr/lib/go-1.18/src/testing/testing.go:1486 +0x724
+  testing.runTests.func1()
+      /usr/lib/go-1.18/src/testing/testing.go:1839 +0x99
+  testing.tRunner()
+      /usr/lib/go-1.18/src/testing/testing.go:1439 +0x213
+  testing.runTests()
+      /usr/lib/go-1.18/src/testing/testing.go:1837 +0x7e4
+  testing.(*M).Run()
+      /usr/lib/go-1.18/src/testing/testing.go:1719 +0xa71
+  main.main()
+      _testmain.go:47 +0x2e4
+==================
+Run
+Run
+--- FAIL: TestRemoteJobRunner (2.00s)
+    testing.go:1312: race detected during execution of test
+FAIL
+FAIL	github.com/equilibristofgo/sandbox/05_race_condition/v1	2.017s
+FAIL
