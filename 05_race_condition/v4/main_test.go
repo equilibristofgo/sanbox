@@ -28,8 +28,8 @@ func TestRemoteJobRunner(t *testing.T) {
 	mdb2b := NewMemoryDB()
 	cache := NewLockFreeJobCache(mdb2b)
 
-	mockRemoteJob.Init(cache)
-	cache.Start()
+	// mockRemoteJob.Init(cache)
+	// cache.Start()
 	mockRemoteJob.Run(cache)
 
 	mockRemoteJob.lock.RLock()

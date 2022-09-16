@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"net/http"
-	"sync"
 )
 
 type JobRunner struct {
@@ -43,12 +42,10 @@ func (j *JobRunner) checkExpected(statusCode int) bool {
 	return false
 }
 
-var globalLock sync.RWMutex
-
 // setHeaders sets default and user specific headers to the http request
 func (j *JobRunner) setHeaders(req *http.Request) {
-	globalLock.RLock()
-	defer globalLock.RUnlock()
+	j.job.lock.RLock()
+	defer j.job.lock.RUnlock()
 
 	if j.job.RemoteProperties.Headers == nil {
 		j.job.RemoteProperties.Headers = http.Header{}

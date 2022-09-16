@@ -14,6 +14,21 @@ type Job struct {
 }
 
 // Other type...
+
+func (j *Job) Init(c JobCache) error {
+	j.lock.Lock()
+	defer j.lock.Unlock()
+
+	c.Set(j)
+	go j.Run(c)
+
+	j.lock.Unlock()
+	j.StartWaiting(c)
+	j.lock.Lock()
+
+	return nil
+}
+
 func (j *Job) StartWaiting(cache JobCache) {
 
 	j.lock.Lock()
@@ -54,18 +69,4 @@ func (j *Job) Run(c JobCache) {
 	j.lock.Unlock()
 
 	fmt.Println("Run")
-}
-
-func (j *Job) Init(c JobCache) error {
-	j.lock.Lock()
-	defer j.lock.Unlock()
-
-	c.Set(j)
-	go j.Run(c)
-
-	j.lock.Unlock()
-	j.StartWaiting(c)
-	j.lock.Lock()
-
-	return nil
 }

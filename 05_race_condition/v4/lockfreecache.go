@@ -38,6 +38,8 @@ func (c *LockFreeJobCache) GetAll() *JobsMap {
 func (c *LockFreeJobCache) Start() {
 	allJobs, _ := c.jobDB.GetAll()
 	for _, j := range allJobs {
+		j.lock.Lock()
 		j.StartWaiting(c)
+		j.lock.Unlock()
 	}
 }

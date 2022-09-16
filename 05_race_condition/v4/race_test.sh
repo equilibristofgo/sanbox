@@ -1,1 +1,1 @@
-go test -race -timeout 30s -run ^TestRemoteJobRunner$ github.com/equilibristofgo/sandbox/05_race_condition/v3
+go test -race -timeout 30s -run ^TestRemoteJobRunner$ github.com/equilibristofgo/sandbox/05_race_condition/v4
