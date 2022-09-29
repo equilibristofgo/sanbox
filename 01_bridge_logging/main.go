@@ -137,7 +137,7 @@ func main() {
 		logRechargeEngineContextFieldsFromActivity,
 	}
 
-	loggerContextualFromZAP.InfoWithContext(enc.ctx).Bool("Result", false).Str("Tenant", "lyca").Msg("This was a sample with ZEROLOG")
+	loggerContextualFromZAP.InfoWithContext(enc.ctx).Bool("Result", false).Msg("This was a sample with ZEROLOG")
 
 	// Adding again ... simulating cadence internals?
 	zapLoggerCustomEncoder = zapLoggerCustomEncoder.With(
@@ -146,6 +146,6 @@ func main() {
 		zapcore.Field{Key: "tagRunID", Type: zapcore.StringType, String: "YYY"},
 	).WithOptions(zap.WrapCore(func(c zapcore.Core) zapcore.Core { return zapCore }))
 
-	loggerContextualFromZAP.InfoWithContext(enc.ctx).Bool("Result", false).Str("Tenant", "lyca").Msg("This was a sample with ZAP")
+	loggerContextualFromZAP.InfoWithContext(enc.ctx).Bool("Result", false).Msg("This was a sample with ZAP")
 
 }
