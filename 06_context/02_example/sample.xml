@@ -1,0 +1,9 @@
+<?xml version='1.0'?>
+<methodCall>
+<methodName>method1</methodName>
+<params>
+<param>
+<value><string>123456789</string></value>
+</param>
+</params>
+</methodCall>
