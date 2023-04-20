@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "01_example"
+		},
+		{
+			"path": "02_example"
+		},
+		{
+			"path": "02_example/upstream"
+		}
+	],
+	"settings": {}
+}
