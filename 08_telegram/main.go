@@ -104,7 +104,7 @@ func main() {
 			switch update.Message.Command() {
 			case "help":
 				msg.Text = "I understand /soy nombre and /status."
-			case "soy (nombre)":
+			case "soy":
 				name := update.Message.CommandArguments()
 				msg.Text = "https://www.accreativos.com/livekit/index.html#/room?url=https%3A%2F%2Flivekit.accreativos.com%2F&token=" +
 					createToken(
