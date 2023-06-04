@@ -1,0 +1,20 @@
+{
+	"folders": [
+		{
+			"path": "."
+		},
+		{
+			"path": "01_example"
+		},
+		{
+			"path": "02_example"
+		},
+		{
+			"path": "03_example"
+		},
+		{
+			"path": "04_example"
+		}
+	],
+	"settings": {}
+}

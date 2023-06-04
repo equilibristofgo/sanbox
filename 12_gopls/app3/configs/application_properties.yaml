@@ -1,0 +1,12 @@
+micro:
+  name: micro-template
+http_handler:
+  type: restful
+  url: 127.0.0.1
+  port: 4000
+  swagger: ../docs/swagger.yaml
+  debug_level: DEBUG #[TRACE, DEBUG, INFO, WARN, ERROR]
+repository:
+  db: postgres #postgres, mongo
+auth:
+  enable: true
